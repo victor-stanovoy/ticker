@@ -127,6 +127,26 @@ details code{font:400 .8rem var(--f-mono);overflow-wrap:anywhere}
 .foot{padding-block:clamp(3rem,7vw,6rem) 2.5rem;border-top:1px solid var(--line)}
 .big{margin:0;font:600 clamp(2.4rem,10vw,10rem)/.9 var(--f-display);font-stretch:80%;letter-spacing:-.045em}
 .fine{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem;margin-top:3rem;font:500 .72rem/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.chips button{padding:.6rem .9rem;border:1px solid var(--line);background:transparent;font:500 .72rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;transition:.25s}
+.chips button:hover{border-color:var(--ink)}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.presets{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.75rem;margin:0 0 2.5rem}
+.presets button{display:grid;gap:.5rem;text-align:left;padding:1rem;border:1px solid var(--line);background:var(--surface);transition:.25s}
+.presets b{font:700 1.5rem/1 var(--f-display);font-stretch:80%;letter-spacing:-.03em}
+.presets span{font:400 .85rem/1.3 var(--f-body);color:var(--muted)}
+.presets button:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.presets button:hover span{color:inherit;opacity:.8}
+.opts{display:grid;gap:.9rem;margin-top:1.75rem}
+.chk{display:flex;gap:.7rem;align-items:flex-start;font-size:.95rem}
+.chk input{margin-top:.3rem;accent-color:var(--accent);width:1rem;height:1rem;flex:none}
+.chk small{display:block;color:var(--muted)}
+.fld{display:grid;gap:.4rem;margin-bottom:1.25rem}
+.fld label{font:500 .72rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.fld input,.fld select,.fld textarea{padding:.65rem .75rem;border:1px solid var(--line);background:var(--bg);border-radius:0;min-width:0}
+.fld input:hover,.fld input:focus,.fld select:hover,.fld textarea:hover,.fld textarea:focus{border-color:var(--ink)}
+.fld textarea{min-height:7rem;font:400 .8rem/1.4 var(--f-mono)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:clamp(1.5rem,4vw,3rem)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -164,6 +184,17 @@ details code{font:400 .8rem var(--f-mono);overflow-wrap:anywhere}
     <p class="label">01 · Sources</p>
     <h2 class="h2">What should your tab say?</h2>
     <p class="sub">Switch on as many as you like. They are mixed into one stream. Everything runs in your browser and your choices are saved on this device.</p>
+    <p class="tag" style="margin:0 0 .75rem">Start from a preset</p>
+    <div class="presets" id="presets"></div>
+    <p class="tag" style="margin:0 0 .75rem">Or build your own</p>
+    <div class="chips" id="chips" role="group" aria-label="Filter sources">
+      <button type="button" data-c="all" aria-pressed="true">All</button>
+      <button type="button" data-c="news" aria-pressed="false">News</button>
+      <button type="button" data-c="mail" aria-pressed="false">Mail</button>
+      <button type="button" data-c="time" aria-pressed="false">Time</button>
+      <button type="button" data-c="data" aria-pressed="false">Data</button>
+      <button type="button" data-c="mind" aria-pressed="false">Mind</button>
+    </div>
     <div class="cards" id="cards"></div>
   </section>
 
@@ -174,29 +205,67 @@ details code{font:400 .8rem var(--f-mono);overflow-wrap:anywhere}
       <div class="style-l">
         <div class="seg" id="modes" role="group" aria-label="Display style">
           <button type="button" data-m="ticker" aria-pressed="true">Ticker</button>
-          <button type="button" data-m="reverse" aria-pressed="false">Reverse</button>
-          <button type="button" data-m="bounce" aria-pressed="false">Bounce</button>
           <button type="button" data-m="rotate" aria-pressed="false">Rotate</button>
-          <button type="button" data-m="shuffle" aria-pressed="false">Shuffle</button>
-          <button type="button" data-m="typewriter" aria-pressed="false">Typewriter</button>
-          <button type="button" data-m="static" aria-pressed="false">Newest only</button>
+          <button type="button" data-m="static" aria-pressed="false">First item</button>
+          <button type="button" data-m="type" aria-pressed="false">Typewriter</button>
+          <button type="button" data-m="decode" aria-pressed="false">Decode</button>
+          <button type="button" data-m="wave" aria-pressed="false">Wave</button>
+          <button type="button" data-m="glitch" aria-pressed="false">Glitch</button>
+          <button type="button" data-m="blink" aria-pressed="false">Blink</button>
         </div>
         <p class="mode-note" id="modeNote"></p>
-        <p class="mode-note" style="margin-top:.75rem">Ticker types change how the browser-tab title moves; your sources stay the same.</p>
+        <div class="opts">
+          <label class="chk"><input type="checkbox" id="o-caps"><span>ALL CAPS<small>Shout the title.</small></span></label>
+          <label class="chk"><input type="checkbox" id="o-away"><span>Quiet while I’m on this page<small>Shows a plain title here and starts the feed when you switch to another tab.</small></span></label>
+          <label class="chk"><input type="checkbox" id="o-flash"><span>Flash on new mail and quakes<small>The title blinks “New!” beside the item for nine seconds.</small></span></label>
+          <label class="chk"><input type="checkbox" id="o-notify"><span>Also send a desktop notification<small>Your browser will ask for permission.</small></span></label>
+          <div><button class="btn" id="tryAlert" type="button">Try an alert</button></div>
+        </div>
       </div>
       <div class="style-r">
         <div class="rng"><label for="spd"><span>Speed</span><span id="spdV"></span></label><input id="spd" type="range" min="1" max="10" step="1"></div>
         <div class="rng"><label for="wid"><span>Characters shown</span><span id="widV"></span></label><input id="wid" type="range" min="20" max="60" step="2"></div>
-        <div class="rng"><label for="pre"><span>Prefix emoji</span></label><input id="pre" type="text" maxlength="4" placeholder="e.g. 📰" style="padding:.65rem .75rem;border:1px solid var(--line);background:var(--bg);border-radius:0"></div>
+        <div class="fld"><label for="pre">Prefix emoji</label><input id="pre" type="text" maxlength="4" placeholder="e.g. 📰"></div>
+        <div class="fld"><label for="sep">Ticker divider</label><select id="sep"><option value="✦">✦ star</option><option value="•">• dot</option><option value="▸">▸ arrow</option><option value="|">| bar</option><option value="★">★ big star</option><option value="·">· small dot</option></select></div>
+        <div class="fld"><label for="home">Title while you’re on this page (quiet mode)</label><input id="home" type="text" maxlength="40" placeholder="Tabline"></div>
       </div>
     </div>
   </section>
 
+  <section class="sec" id="icon">
+    <p class="label">03 · Tab icon</p>
+    <h2 class="h2">Dress the icon.</h2>
+    <p class="sub">The little picture left of the title. Unread mail adds a red count on any style. The ring fills with your day, or with the focus timer while it runs.</p>
+    <div class="seg" id="icons" role="group" aria-label="Icon style">
+      <button type="button" data-i="letter" aria-pressed="true">Letter</button>
+      <button type="button" data-i="emoji" aria-pressed="false">Emoji</button>
+      <button type="button" data-i="ring" aria-pressed="false">Day ring</button>
+    </div>
+    <div class="fld" style="max-width:14rem"><label for="iconEmoji">Emoji for the icon</label><input id="iconEmoji" type="text" maxlength="4"></div>
+  </section>
+
   <section class="sec" id="now">
-    <p class="label">03 · In your tab right now</p>
+    <p class="label">04 · In your tab right now</p>
     <h2 class="h2">The stream.</h2>
     <ul class="feed" id="feed"></ul>
     <div class="empty" id="feedEmpty">Nothing yet. Switch on a source.</div>
+  </section>
+
+  <section class="sec" id="share">
+    <p class="label">05 · Keep and share</p>
+    <h2 class="h2">Take it with you.</h2>
+    <div class="two">
+      <div>
+        <p class="sub">Your setup is saved on this device. Copy a link to open the same setup anywhere. Your Google client ID is never included.</p>
+        <div class="row"><button class="btn" id="shCopy" type="button">Copy share link</button><button class="btn" id="shReset" type="button">Reset everything</button></div>
+        <p class="status" id="shNote" role="status" style="margin-top:1rem"></p>
+      </div>
+      <div class="fld">
+        <label for="shBox">Setup as text</label>
+        <textarea id="shBox" spellcheck="false" placeholder="Press “Show current”, or paste a setup and press “Load this”."></textarea>
+        <div class="row"><button class="btn" id="shExport" type="button">Show current</button><button class="btn" id="shImport" type="button">Load this</button></div>
+      </div>
+    </div>
   </section>
 
   <section class="sec" id="notes">
@@ -225,10 +294,15 @@ var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 var BASE='Tabline', SEP='   ✦   ';
 
 /* ---------- saved settings ---------- */
-var DEF={on:['clock','wiki'],mode:'ticker',speed:5,width:38,prefix:'',city:'Vienna',feed:'bbc',feedUrl:'',custom:'Ship it today\nDrink water 💧',calendar:'',tasks:'',countdownDate:'',clientId:'',pomoMin:25};
+var DEF={on:['clock','wiki'],mode:'ticker',speed:5,width:38,prefix:'',city:'Vienna',feed:'bbc',feedUrl:'',custom:'Ship it today\nDrink water 💧',clientId:'',pomoMin:25};
 var S=Object.assign({},DEF);
 try{var sv=JSON.parse(localStorage.getItem('tl-state')||'null');if(sv)Object.assign(S,sv);}catch(e){}
 function save(){try{localStorage.setItem('tl-state',JSON.stringify(S));}catch(e){}}
+/* a share link (#s=...) loads someone's setup */
+try{var hm=/^#s=(.+)$/.exec(location.hash);if(hm){var imp=JSON.parse(decodeURIComponent(escape(atob(hm[1]))));delete imp.clientId;Object.assign(S,imp);save();history.replaceState(null,'',location.pathname+location.search);}}catch(e){}
+var EXTRA={sep:'✦',caps:false,away:false,home:'Tabline',flash:true,notify:false,icon:'letter',emoji:'🗞️',cdLabel:'Launch day',cdDate:'',tz:'America/New_York, Asia/Tokyo',fxFrom:'EUR',fxTo:'USD, GBP, CHF',repo:'torvalds/linux',sunCity:'Vienna'};
+Object.keys(EXTRA).forEach(function(k){if(S[k]===undefined)S[k]=EXTRA[k];});
+if(!Array.isArray(S.on))S.on=DEF.on.slice();
 
 /* ---------- theme ---------- */
 var root=document.documentElement, themeBtn=$('#themeBtn');
@@ -311,6 +385,56 @@ var LOAD={
   }
 };
 
+function geo(city){
+  city=(city||'').trim();if(!city)return Promise.reject(new Error('Type a city'));
+  return getJson('https://geocoding-api.open-meteo.com/v1/search?count=1&name='+encodeURIComponent(city)).then(function(g){
+    if(!g.results||!g.results.length)throw new Error('City not found');return g.results[0];
+  });
+}
+LOAD.sun=function(){
+  return geo(S.sunCity).then(function(r){
+    return getJson('https://api.open-meteo.com/v1/forecast?latitude='+r.latitude+'&longitude='+r.longitude+'&daily=sunrise,sunset&timezone=auto&forecast_days=1').then(function(w){
+      return ['🌅 '+r.name+' · sunrise '+w.daily.sunrise[0].slice(11,16)+' · sunset '+w.daily.sunset[0].slice(11,16)];
+    });
+  });
+};
+LOAD.quakes=function(){
+  return getJson('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson').then(function(j){
+    return (j.features||[]).slice(0,8).map(function(f){var p=f.properties||{};return '🌍 M'+(p.mag!=null?(+p.mag).toFixed(1):'?')+' · '+(p.place||'unknown');});
+  });
+};
+LOAD.iss=function(){
+  return getJson('https://api.wheretheiss.at/v1/satellites/25544').then(function(j){
+    var la=j.latitude,lo=j.longitude;
+    return ['🛰 ISS · '+Math.abs(la).toFixed(1)+'°'+(la>=0?'N':'S')+' '+Math.abs(lo).toFixed(1)+'°'+(lo>=0?'E':'W')+' · '+Math.round(j.velocity).toLocaleString('en-US')+' km/h'];
+  });
+};
+LOAD.fx=function(){
+  var from=String(S.fxFrom||'EUR').toUpperCase().trim(),to=String(S.fxTo||'USD').toUpperCase().replace(/\s+/g,'');
+  return getJson('https://api.frankfurter.dev/v1/latest?base='+encodeURIComponent(from)+'&symbols='+encodeURIComponent(to)).then(function(j){
+    return Object.keys(j.rates||{}).map(function(k){return '💱 1 '+j.base+' = '+(+j.rates[k]).toFixed(4)+' '+k;});
+  });
+};
+LOAD.github=function(){
+  var r=String(S.repo||'').trim();
+  if(!/^[\w.-]+\/[\w.-]+$/.test(r))return Promise.reject(new Error('Use owner/repo'));
+  return getJson('https://api.github.com/repos/'+r).then(function(j){
+    return ['⭐ '+j.full_name+' · '+j.stargazers_count.toLocaleString('en-US')+' stars · '+j.open_issues_count+' open issues'];
+  });
+};
+
+/* alerts: a new email or quake makes the title blink */
+var ALERT={inbox:1,demo:1,quakes:1},alertUntil=0,alertText='';
+function fireAlert(t){
+  alertText=t;alertUntil=Date.now()+9000;
+  if(S.notify&&window.Notification&&Notification.permission==='granted'){try{new Notification('Tabline',{body:t.replace(/^\S+\s/,'')});}catch(e){}}
+}
+function noteNew(id,a){
+  if(!ALERT[id]||!cache[id])return;
+  var fresh=a.filter(function(t){return cache[id].indexOf(t)<0;});
+  if(fresh.length)fireAlert(fresh[0]);
+}
+
 /* Gmail through Google Identity Services, read-only, with the visitor's own client ID */
 var gToken=null,gClient=null,gExp=0;
 function gmailFetch(){
@@ -346,45 +470,6 @@ LOAD.inbox=function(){
   });
 };
 
-LOAD.stocks=function(){
-  return getJson('https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=1d&interval=1d').then(function(j){
-    var r=j.chart&&j.chart.result&&j.chart.result[0];
-    if(!r)throw new Error('Market unavailable');
-    var q=r.meta||{}, price=q.regularMarketPrice;
-    var prev=q.chartPreviousClose||q.previousClose;
-    var ch=(price!=null&&prev)?((price-prev)/prev*100):null;
-    return ['📈 S&P 500 '+(price!=null?price.toFixed(2):'—')+(ch==null?'':(' '+(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(2)+'%'))];
-  });
-};
-
-LOAD.calendar=function(){
-  return Promise.resolve(String(S.calendar||'').split('\\n').map(function(x){return x.trim();}).filter(Boolean).map(function(x){return '📅 '+x;}));
-};
-
-LOAD.tasks=function(){
-  return Promise.resolve(String(S.tasks||'').split('\\n').map(function(x){return x.trim();}).filter(Boolean).map(function(x){return '☐ '+x;}));
-};
-
-LOAD.countdown=function(){
-  var target=S.countdownDate?new Date(S.countdownDate):null;
-  if(!target||isNaN(target.getTime()))return Promise.resolve(['⏳ Set a countdown date']);
-  var ms=target.getTime()-Date.now();
-  if(ms<=0)return Promise.resolve(['⏳ Time!']);
-  var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);
-  return Promise.resolve(['⏳ '+d+'d '+h+'h '+m+'m left']);
-};
-
-LOAD.quote=function(){
-  var quotes=[
-    '“Stay curious.”',
-    '“Make it simple.”',
-    '“One thing at a time.”',
-    '“Keep going.”',
-    '“Build something useful.”'
-  ];
-  return Promise.resolve(quotes.map(function(x){return '💬 '+x;}));
-};
-
 /* live sources: rebuilt on every beat */
 var pomoEnd=0;
 var LIVE={
@@ -392,20 +477,63 @@ var LIVE={
     var d=new Date();
     return ['🕑 '+p2(d.getHours())+':'+p2(d.getMinutes())+' · '+d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})];
   },
-  day:function(){
-    var d=new Date(),start=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime(),end=start+864e5;
-    return ['◷ '+((Date.now()-start)/(end-start)*100).toFixed(1)+'% of today'];
-  },
-  year:function(){
-    var d=new Date(),start=new Date(d.getFullYear(),0,1).getTime(),end=new Date(d.getFullYear()+1,0,1).getTime();
-    return ['◴ '+((Date.now()-start)/(end-start)*100).toFixed(1)+'% of '+d.getFullYear()];
-  },
   pomo:function(){
     if(!pomoEnd)return ['🍅 Focus timer ready'];
     var left=pomoEnd-Date.now();
     if(left<=0)return ['✅ Time! Take a break'];
     var s=Math.ceil(left/1000);return ['🍅 '+p2(Math.floor(s/60))+':'+p2(s%60)+' focus'];
   }
+};
+
+/* more live sources */
+var swRun=0,swAcc=0,eyeT0=Date.now();
+function bar(f,n){n=n||10;var k=Math.round(f*n);return '▰'.repeat(k)+'▱'.repeat(n-k);}
+LIVE.day=function(){
+  var d=new Date(),s0=new Date(d.getFullYear(),d.getMonth(),d.getDate()),f=(d-s0)/864e5;
+  var y0=new Date(d.getFullYear(),0,1),y1=new Date(d.getFullYear()+1,0,1),yf=(d-y0)/(y1-y0);
+  return ['🗓 Day '+bar(f)+' '+Math.round(f*100)+'% · Year '+Math.round(yf*100)+'%'];
+};
+LIVE.countdown=function(){
+  var label=S.cdLabel||'the day',t=new Date((S.cdDate||'')+'T00:00:00');
+  if(!S.cdDate||isNaN(t))return ['⏳ Pick a date for the countdown'];
+  var left=t-Date.now();
+  if(left<=0)return ['🎉 '+label+' is here'];
+  var s=Math.floor(left/1000),d=Math.floor(s/86400);
+  if(d>=1)return ['⏳ '+d+' day'+(d>1?'s':'')+' to '+label];
+  return ['⏳ '+p2(Math.floor(s/3600))+':'+p2(Math.floor(s%3600/60))+':'+p2(s%60)+' to '+label];
+};
+LIVE.stopwatch=function(){
+  var ms=swAcc+(swRun?Date.now()-swRun:0),s=Math.floor(ms/1000);
+  return [(swRun?'⏱ ':'⏸ ')+p2(Math.floor(s/3600))+':'+p2(Math.floor(s%3600/60))+':'+p2(s%60)];
+};
+LIVE.eyes=function(){
+  var sec=Math.floor((Date.now()-eyeT0)/1000)%1220;
+  if(sec>=1200)return ['👀 Look 20 feet away · '+(1220-sec)+'s'];
+  return ['👀 Eye break in '+Math.ceil((1200-sec)/60)+' min'];
+};
+LIVE.breathe=function(){
+  var sec=(Date.now()/1000)%16,ph=Math.floor(sec/4),n=Math.floor(sec%4)+1,L=['Inhale','Hold','Exhale','Hold'];
+  return ['🫁 '+L[ph]+' '+(ph===2?4-n+1:n)];
+};
+var PH=[['🌑','New moon'],['🌒','Waxing crescent'],['🌓','First quarter'],['🌔','Waxing gibbous'],['🌕','Full moon'],['🌖','Waning gibbous'],['🌗','Last quarter'],['🌘','Waning crescent']];
+LIVE.moon=function(){
+  var days=(Date.now()-Date.UTC(2000,0,6,18,14))/864e5,syn=29.530588853,f=(((days%syn)+syn)%syn)/syn;
+  var i=Math.floor(f*8+.5)%8,lit=Math.round((1-Math.cos(2*Math.PI*f))/2*100);
+  return [PH[i][0]+' '+PH[i][1]+' · '+lit+'% lit'];
+};
+LIVE.tz=function(){
+  var parts=String(S.tz||'').split(',').map(function(z){return z.trim();}).filter(Boolean).slice(0,4).map(function(z){
+    try{return z.split('/').pop().replace(/_/g,' ')+' '+new Date().toLocaleTimeString('en-GB',{timeZone:z,hour:'2-digit',minute:'2-digit'});}
+    catch(e){return z+' ?';}
+  });
+  return parts.length?['🌍 '+parts.join(' · ')]:['🌍 Add time zones'];
+};
+var QUOTES=['Small pages, done daily.','Make it work, then make it kind.','One tab, one thing.','Start before you feel ready.','The draft is a gift to your future self.','Slow is smooth, and smooth is fast.','Ask a better question today.','Write it down and it gets lighter.','Ship the small version.','Notice one new thing today.'];
+LIVE.quotes=function(){return ['💬 '+QUOTES[Math.floor(Date.now()/300000)%QUOTES.length]];};
+var batt=null;try{if(navigator.getBattery)navigator.getBattery().then(function(b){batt=b;});}catch(e){}
+LIVE.device=function(){
+  var o=navigator.onLine?'📶 online':'📵 offline';
+  return batt?['🔋 '+Math.round(batt.level*100)+'%'+(batt.charging?' ⚡':'')+' · '+o]:[o];
 };
 
 /* ---------- source catalogue ---------- */
@@ -418,16 +546,28 @@ var SRC=[
   {id:'demo',n:'Inbox demo',d:'Fake emails, to see how mail looks in a tab.'},
   {id:'weather',n:'Weather',d:'Temperature and sky for your city.',cfg:'weather'},
   {id:'crypto',n:'Prices',d:'Bitcoin and Ether, with the 24 hour change.'},
-  {id:'stocks',n:'Stock market',d:'A quick market snapshot for major indexes and companies.',cfg:'stocks'},
-  {id:'calendar',n:'Calendar',d:'See upcoming events without opening your calendar.',cfg:'calendar'},
-  {id:'tasks',n:'Tasks',d:'Keep a short list of things you want to remember.',cfg:'tasks'},
-  {id:'countdown',n:'Countdown',d:'Count down to a date or event directly in the tab.',cfg:'countdown'},
-  {id:'day',n:'Day progress',d:'Show how far through today you are.',live:true},
-  {id:'year',n:'Year progress',d:'Show how far through the current year you are.',live:true},
-  {id:'quote',n:'Quote',d:'A rotating quote or thought for the day.',cfg:'quote'},
+  {id:'pomo',n:'Focus timer',d:'A countdown that lives in the tab.',live:true,cfg:'pomo'},
   {id:'custom',n:'Your lines',d:'Reminders, mantras, anything. One per line.',cfg:'custom'}
 ];
-var REFRESH={inbox:120000,rss:600000,wiki:900000,hn:600000,weather:900000,crypto:120000,stocks:120000,calendar:60000,tasks:60000,countdown:1000,quote:3600000};
+SRC.push(
+  {id:'day',n:'Day progress',d:'How far through today and this year you are.',live:true},
+  {id:'countdown',n:'Countdown',d:'Days, then hours, until a date that matters.',live:true,fields:[{k:'cdLabel',label:'Name',ph:'Launch day'},{k:'cdDate',label:'Date',type:'date'}]},
+  {id:'stopwatch',n:'Stopwatch',d:'Time something without leaving the tab.',live:true},
+  {id:'eyes',n:'Eye breaks',d:'A 20-20-20 nudge: every 20 minutes, look 20 feet away for 20 seconds.',live:true},
+  {id:'breathe',n:'Breathing',d:'Box breathing, four seconds a side, right in the tab.',live:true},
+  {id:'moon',n:'Moon',d:'Today’s moon phase and how much of it is lit.',live:true},
+  {id:'tz',n:'World clocks',d:'Up to four time zones, comma separated.',live:true,fields:[{k:'tz',label:'Time zones',ph:'America/New_York, Asia/Tokyo'}]},
+  {id:'quotes',n:'Gentle nudges',d:'A short line that changes every five minutes.',live:true},
+  {id:'device',n:'Device',d:'Battery level and whether you are online.',live:true},
+  {id:'sun',n:'Sunrise and sunset',d:'Light hours for your city today.',fields:[{k:'sunCity',label:'City',ph:'Your city',reload:true}]},
+  {id:'quakes',n:'Earthquakes',d:'Magnitude 4.5 and up, last 24 hours, from USGS.'},
+  {id:'iss',n:'Space station',d:'Where the ISS is right now.'},
+  {id:'fx',n:'Exchange rates',d:'Currency rates from the European Central Bank.',fields:[{k:'fxFrom',label:'From',ph:'EUR',reload:true},{k:'fxTo',label:'To (comma separated)',ph:'USD, GBP',reload:true}]},
+  {id:'github',n:'GitHub repo',d:'Stars and open issues for any public repository.',fields:[{k:'repo',label:'owner/repo',ph:'torvalds/linux',reload:true}]}
+);
+var CAT={clock:'time',day:'time',countdown:'time',stopwatch:'time',pomo:'time',tz:'time',wiki:'news',hn:'news',rss:'news',quakes:'news',inbox:'mail',demo:'mail',weather:'data',sun:'data',crypto:'data',fx:'data',github:'data',iss:'data',device:'data',moon:'mind',eyes:'mind',breathe:'mind',quotes:'mind',custom:'mind'};
+var swEl={};
+var REFRESH={inbox:120000,rss:600000,wiki:900000,hn:600000,weather:900000,crypto:120000,sun:3600000,quakes:300000,iss:15000,fx:3600000,github:600000};
 var timers={};
 
 function enabled(id){return S.on.indexOf(id)>-1;}
@@ -437,7 +577,7 @@ function refresh(id){
   LOAD[id]().then(function(a){
     a=(a||[]).filter(function(t){return t&&t.length>3;}).map(function(t){return clip(t,160);}).slice(0,14);
     if(!a.length)throw new Error('Nothing came back');
-    cache[id]=a;setStatus(id,a.length+' item'+(a.length>1?'s':'')+' · updated '+p2(new Date().getHours())+':'+p2(new Date().getMinutes()));
+    noteNew(id,a);cache[id]=a;setStatus(id,a.length+' item'+(a.length>1?'s':'')+' · updated '+p2(new Date().getHours())+':'+p2(new Date().getMinutes()));
     paintFeed();
   }).catch(function(e){
     delete cache[id];setStatus(id,(e&&e.message)||'Could not load',true);paintFeed();
@@ -466,7 +606,7 @@ SRC.forEach(function(s){
   var c=document.createElement('article');c.className='card'+(enabled(s.id)?' on':'');c.setAttribute('data-card',s.id);
   c.innerHTML='<div class="card-top"><span class="tag">'+(s.live?'Live':'Fetched')+'</span><button class="sw" type="button" role="switch" aria-checked="'+enabled(s.id)+'" aria-label="Use '+s.n+'"></button></div><div><h3>'+s.n+'</h3></div><p>'+s.d+'</p><div class="cfg"></div><div class="status" role="status"></div>';
   var cfg=$('.cfg',c),sw=$('.sw',c);
-  statusEl[s.id]=$('.status',c);
+  statusEl[s.id]=$('.status',c);c.setAttribute('data-cat',CAT[s.id]||'data');swEl[s.id]=sw;
   sw.addEventListener('click',function(){var on=sw.getAttribute('aria-checked')!=='true';sw.setAttribute('aria-checked',on);toggle(s.id,on);});
   function inp(html){cfg.innerHTML=html;}
   if(s.cfg==='rss'){
@@ -481,25 +621,7 @@ SRC.forEach(function(s){
   }else if(s.cfg==='custom'){
     inp('<label for="cu">One line each</label><textarea id="cu" spellcheck="false"></textarea>');
     var cu=$('#cu',c);cu.value=S.custom;
-    cu.addEventListener('input',function(){S.custom=cu.value;save();cache.custom=LOAD.custom?String(S.custom).split('\\n').map(function(x){return x.trim();}).filter(Boolean):[];paintFeed();});
-  }else if(s.cfg==='calendar'){
-    inp('<label for="ca">Upcoming events</label><textarea id="ca" spellcheck="false" placeholder="Tomorrow · 10:00 Team meeting"></textarea>');
-    var ca=$('#ca',c);ca.value=S.calendar;
-    ca.addEventListener('input',function(){S.calendar=ca.value;save();arm('calendar');});
-  }else if(s.cfg==='tasks'){
-    inp('<label for="ta">Tasks</label><textarea id="ta" spellcheck="false" placeholder="Finish homework\\nReply to Alex"></textarea>');
-    var ta=$('#ta',c);ta.value=S.tasks;
-    ta.addEventListener('input',function(){S.tasks=ta.value;save();arm('tasks');});
-  }else if(s.cfg==='countdown'){
-    inp('<label for="cd">Date and time</label><input id="cd" type="datetime-local">');
-    var cd=$('#cd',c);cd.value=S.countdownDate;
-    cd.addEventListener('change',function(){S.countdownDate=cd.value;save();arm('countdown');});
-  }else if(s.cfg==='stocks'){
-    cfg.innerHTML='<div class="status">Uses a public market quote endpoint.</div>';
-  }else if(s.cfg==='custom'){
-    inp('<label for="cu">One line each</label><textarea id="cu" spellcheck="false"></textarea>');
-    var cu=$('#cu',c);cu.value=S.custom;
-    cu.addEventListener('input',function(){S.custom=cu.value;save();cache.custom=String(S.custom).split('\\n').map(function(x){return x.trim();}).filter(Boolean);paintFeed();});
+    cu.addEventListener('input',function(){S.custom=cu.value;save();cache.custom=LOAD.custom?String(S.custom).split('\n').map(function(x){return x.trim();}).filter(Boolean):[];paintFeed();});
   }else if(s.cfg==='pomo'){
     inp('<label for="pm">Minutes</label><input id="pm" type="number" min="1" max="120" value="'+S.pomoMin+'"><div class="row"><button class="btn" id="ps" type="button">Start</button><button class="btn" id="pr" type="button">Reset</button></div>');
     var pm=$('#pm',c);
@@ -510,6 +632,19 @@ SRC.forEach(function(s){
     inp('<label for="gi">Google OAuth client ID</label><input id="gi" type="text" spellcheck="false" placeholder="123456-abc.apps.googleusercontent.com"><details><summary>How to get one (2 min)</summary><ol><li>In Google Cloud Console, create a project and enable the <b>Gmail API</b>.</li><li>Create an OAuth client ID of type <b>Web application</b>.</li><li>Add this page’s address as an authorised JavaScript origin. It must be served over https or localhost, not opened as a file.</li><li>Paste the client ID here and switch Inbox on. Access is read-only.</li></ol></details>');
     var gi=$('#gi',c);gi.value=S.clientId;
     gi.addEventListener('change',function(){S.clientId=gi.value.trim();save();gToken=null;if(enabled('inbox'))arm('inbox');});
+  }else if(s.id==='stopwatch'){
+    inp('<div class="row"><button class="btn" id="sw1" type="button">Start / pause</button><button class="btn" id="sw2" type="button">Reset</button></div>');
+    $('#sw1',c).addEventListener('click',function(){
+      if(swRun){swAcc+=Date.now()-swRun;swRun=0;}else{swRun=Date.now();}
+      if(!enabled('stopwatch')){sw.setAttribute('aria-checked','true');toggle('stopwatch',true);}
+    });
+    $('#sw2',c).addEventListener('click',function(){swRun=0;swAcc=0;});
+  }else if(s.fields){
+    inp(s.fields.map(function(f){var id='f-'+s.id+'-'+f.k;return '<label for="'+id+'">'+f.label+'</label><input id="'+id+'" type="'+(f.type||'text')+'" placeholder="'+(f.ph||'')+'" spellcheck="false">';}).join(''));
+    s.fields.forEach(function(f){
+      var el=$('#f-'+s.id+'-'+f.k,c);el.value=S[f.k]||'';
+      el.addEventListener('change',function(){S[f.k]=el.value.trim();save();if(f.reload)arm(s.id);});
+    });
   }else{cfg.remove();}
   cardsEl.appendChild(c);
   if(s.live&&enabled(s.id))setStatus(s.id,'Live');
@@ -539,78 +674,55 @@ function paintFeed(){
 /* ---------- tab title engine ---------- */
 var t0=Date.now(),worker=null,lastTitle='',favKey='',pv=$('#pvTitle'),pvFav=$('#pvFav');
 function speedMs(){return Math.round(480-S.speed*40);}   /* 1 → 440ms, 10 → 80ms */
+var GL='▒░#%@&$*?';
+var EFFECTS={
+  type:function(c,t){var k=Math.min(c.length,Math.floor(t/70));return c.slice(0,k).join('')+(k<c.length?'▍':'');},
+  decode:function(c,t){var r=Math.floor(t/35);return c.map(function(ch,k){return (k<r||ch===' ')?ch:GL.charAt(Math.floor(Math.random()*GL.length));}).join('');},
+  wave:function(c,t){var i=Math.floor(t/110);return c.map(function(ch,k){return (((k-i)%6)+6)%6<3?ch.toUpperCase():ch.toLowerCase();}).join('');},
+  glitch:function(c){var hit=Math.random()<.3;return c.map(function(ch){return (hit&&ch!==' '&&Math.random()<.35)?GL.charAt(Math.floor(Math.random()*GL.length)):ch;}).join('');},
+  blink:function(c,t){return Math.floor(t/500)%2?'✦ '+c.join('')+' ✦':c.join('');}
+};
+function sepStr(){return '   '+(S.sep||'✦')+'   ';}
+function fin(t){return S.caps?t.toUpperCase():t;}
+function markCur(i){$$('#feed li').forEach(function(li,k){li.classList.toggle('cur',k===i);});}
 function compute(){
+  var now=Date.now();
+  if(S.away&&!document.hidden)return S.home||BASE;
+  if(S.flash&&now<alertUntil)return Math.floor(now/700)%2?'🔔 New!':fin(clip(alertText,60));
   var a=items();
   if(!a.length)return BASE+' · pick a source';
-  var pre=S.prefix?S.prefix+' ':'';
-  var badge=unread>0?'('+unread+') ':'';
-  var base=badge+pre;
-
-  if(S.mode==='static')return base+clip(a[0],60);
-
-  if(S.mode==='rotate'){
-    var ri=Math.floor((Date.now()-t0)/4000)%a.length;
-    $$('#feed li').forEach(function(li,k){li.classList.toggle('cur',k===ri);});
-    return base+clip(a[ri],60);
+  var head=(unread>0?'('+unread+') ':'')+(S.prefix?S.prefix+' ':'');
+  if(S.mode==='static'){markCur(0);return fin(head+clip(a[0],60));}
+  if(S.mode==='rotate'){var i=Math.floor((now-t0)/4000)%a.length;markCur(i);return fin(head+clip(a[i],60));}
+  if(EFFECTS[S.mode]){
+    var D=7000,el=now-t0,j=Math.floor(el/D)%a.length;markCur(j);
+    return fin(head+EFFECTS[S.mode](Array.from(clip(a[j],60)),el%D));
   }
-
-  if(S.mode==='shuffle'){
-    var si=Math.floor((Date.now()-t0)/4000)%a.length;
-    var shuffled=a.slice().sort(function(x,y){
-      var hx=0,hy=0;
-      for(var q=0;q<x.length;q++)hx=(hx*31+x.charCodeAt(q))%1000003;
-      for(var r=0;r<y.length;r++)hy=(hy*31+y.charCodeAt(r))%1000003;
-      return ((hx+si*7919)%1000003)-((hy+si*7919)%1000003);
-    });
-    var current=shuffled[0];
-    var originalIndex=a.indexOf(current);
-    $$('#feed li').forEach(function(li,k){li.classList.toggle('cur',k===originalIndex);});
-    return base+clip(current,60);
-  }
-
-  var chars=Array.from(base+a.join(SEP)+SEP),n=chars.length;
-  var elapsed=Math.floor((Date.now()-t0)/speedMs());
-  var w=Math.min(S.width,n);
-
-  if(S.mode==='reverse'){
-    var reversePos=((n-1)-(elapsed%n)+n)%n,outR='';
-    for(var k=0;k<w;k++)outR+=chars[(reversePos-k+n)%n];
-    $$('#feed li.cur').forEach(function(li){li.classList.remove('cur');});
-    return outR;
-  }
-
-  if(S.mode==='bounce'){
-    var period=Math.max(1,n-w);
-    var cycle=period*2||1;
-    var bp=elapsed%cycle;
-    var start=bp<period?bp:(cycle-bp);
-    var outB='';
-    for(var b=0;b<w;b++)outB+=chars[(start+b)%n];
-    $$('#feed li.cur').forEach(function(li){li.classList.remove('cur');});
-    return outB;
-  }
-
-  if(S.mode==='typewriter'){
-    var full=Array.from(base+a.join(SEP)+SEP);
-    var twCycle=full.length*2+10;
-    var tp=elapsed%twCycle;
-    var count=tp<full.length?tp:Math.max(0,twCycle-tp);
-    return full.slice(0,Math.min(count,w)).join('');
-  }
-
-  // Default: classic forward ticker.
-  var pos=elapsed%n,out='';
-  for(var j=0;j<w;j++)out+=chars[(pos+j)%n];
-  $$('#feed li.cur').forEach(function(li){li.classList.remove('cur');});
-  return out;
+  var chars=Array.from(head+a.join(sepStr())+sepStr()),n=chars.length,pos=Math.floor((now-t0)/speedMs())%n,out='',w=Math.min(S.width,n);
+  for(var k=0;k<w;k++)out+=chars[(pos+k)%n];
+  markCur(-1);
+  return fin(out);
+}
+function iconProg(){
+  if(pomoEnd&&pomoEnd>Date.now())return 1-(pomoEnd-Date.now())/(S.pomoMin*60000);
+  var d=new Date(),s=new Date(d.getFullYear(),d.getMonth(),d.getDate());return (d-s)/864e5;
 }
 function favicon(){
-  var key=theme()+'|'+unread;if(key===favKey)return;favKey=key;
+  var prog=iconProg(),key=theme()+'|'+unread+'|'+S.icon+'|'+S.emoji+'|'+Math.round(prog*100);if(key===favKey)return;favKey=key;
   var c=document.createElement('canvas');c.width=c.height=64;var x=c.getContext('2d');
   var dark=theme()==='dark';
   x.fillStyle=dark?'#8C9BFF':'#2F3DF2';
   x.beginPath();x.moveTo(14,0);x.arcTo(64,0,64,64,14);x.arcTo(64,64,0,64,14);x.arcTo(0,64,0,0,14);x.arcTo(0,0,64,0,14);x.fill();
-  x.fillStyle=dark?'#0A0E1F':'#fff';x.font='700 38px "Helvetica Neue",Arial,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('T',32,35);
+  x.textAlign='center';x.textBaseline='middle';
+  if(S.icon==='emoji'){
+    x.clearRect(0,0,64,64);x.font='46px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';x.fillText(S.emoji||'🗞️',32,36);
+  }else if(S.icon==='ring'){
+    x.clearRect(0,0,64,64);x.fillStyle=dark?'#111733':'#F6F7FA';x.beginPath();x.arc(32,32,32,0,7);x.fill();
+    x.lineWidth=9;x.strokeStyle=dark?'#2A3257':'#C8CDDC';x.beginPath();x.arc(32,32,24,0,7);x.stroke();
+    x.strokeStyle=dark?'#8C9BFF':'#2F3DF2';x.lineCap='round';x.beginPath();x.arc(32,32,24,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.max(.02,Math.min(1,prog)));x.stroke();
+  }else{
+    x.fillStyle=dark?'#0A0E1F':'#fff';x.font='700 38px "Helvetica Neue",Arial,sans-serif';x.fillText('T',32,35);
+  }
   if(unread>0){
     x.fillStyle='#E5334F';x.beginPath();x.arc(46,18,18,0,7);x.fill();
     x.fillStyle='#fff';x.font='700 '+(unread>9?'18':'24')+'px Arial,sans-serif';x.fillText(unread>99?'99+':String(unread),46,19);
@@ -625,7 +737,7 @@ function beat(){
   favicon();paintFeed();
 }
 function startBeat(){
-  var ms=(S.mode==='ticker'||S.mode==='reverse'||S.mode==='bounce'||S.mode==='typewriter'||S.mode==='countdown')?Math.min(speedMs(),200):500;
+  var ms=S.mode==='ticker'?Math.min(speedMs(),200):(EFFECTS[S.mode]?80:500);
   if(worker){try{worker.postMessage('stop');worker.terminate();}catch(e){}worker=null;}
   clearInterval(startBeat.f);
   if(reduce){S.mode='static';}
@@ -638,27 +750,101 @@ function startBeat(){
 }
 
 /* ---------- style controls ---------- */
-var NOTES={
-  ticker:'The title scrolls continuously from left to right through the tab.',
-  reverse:'The same continuous ticker runs in reverse for a different feel.',
-  bounce:'The visible window travels forward, then reverses direction at the edge.',
-  rotate:'One item at a time, switching every four seconds. Good for short lines like mail.',
-  shuffle:'Cycles through the feed in a changing order instead of source order.',
-  typewriter:'The title builds character by character, then clears and starts again.',
-  static:'Shows just the first item. Quiet, and easy on pinned tabs.'
-};
+var NOTES={ticker:'The title scrolls continuously, so a long headline passes through the narrow tab.',rotate:'One item at a time, switching every four seconds. Good for short lines like mail.',static:'Shows just the first item. Quiet, and easy on pinned tabs.',type:'Each item is typed out letter by letter, one after another.',decode:'Scrambled characters settle into each item, like a departure board.',wave:'A ripple of capital letters runs through each item.',glitch:'Each item flickers with corrupted characters now and then.',blink:'Each item pulses with sparkles on either side.'};
 function paintStyle(){
   $$('#modes button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-m')===S.mode?'true':'false');});
   $('#modeNote').textContent=NOTES[S.mode];
   $('#spdV').textContent=S.speed;$('#widV').textContent=S.width;
-  $('#spd').disabled=!(S.mode==='ticker'||S.mode==='reverse'||S.mode==='bounce'||S.mode==='typewriter');
-  $('#wid').disabled=!(S.mode==='ticker'||S.mode==='reverse'||S.mode==='bounce'||S.mode==='typewriter');
+  $('#spd').disabled=S.mode!=='ticker';$('#wid').disabled=S.mode!=='ticker';
 }
 $$('#modes button').forEach(function(b){b.addEventListener('click',function(){S.mode=b.getAttribute('data-m');t0=Date.now();save();paintStyle();startBeat();});});
 $('#spd').value=S.speed;$('#wid').value=S.width;$('#pre').value=S.prefix;
 $('#spd').addEventListener('input',function(){S.speed=+this.value;save();paintStyle();startBeat();});
 $('#wid').addEventListener('input',function(){S.width=+this.value;save();paintStyle();});
 $('#pre').addEventListener('input',function(){S.prefix=this.value.trim();save();});
+
+/* extra style options */
+$('#sep').value=S.sep;$('#sep').addEventListener('change',function(){S.sep=this.value;save();});
+$('#home').value=S.home;$('#home').addEventListener('input',function(){S.home=this.value;save();});
+['caps','away','flash'].forEach(function(k){
+  var el=$('#o-'+k);el.checked=!!S[k];el.addEventListener('change',function(){S[k]=el.checked;save();});
+});
+var nt=$('#o-notify');
+nt.checked=!!S.notify&&!!window.Notification&&Notification.permission==='granted';
+nt.addEventListener('change',function(){
+  if(!nt.checked){S.notify=false;save();return;}
+  if(!window.Notification){nt.checked=false;return;}
+  Notification.requestPermission().then(function(p){S.notify=p==='granted';nt.checked=S.notify;save();});
+});
+$('#tryAlert').addEventListener('click',function(){fireAlert('✉ Maya — Are you free tonight?');$('#liveNote').textContent='Alert sent. Look at the tab title.';});
+
+/* tab icon */
+function paintIcon(){
+  $$('#icons button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-i')===S.icon?'true':'false');});
+  $('#iconEmoji').value=S.emoji;favKey='';
+}
+$$('#icons button').forEach(function(b){b.addEventListener('click',function(){S.icon=b.getAttribute('data-i');save();paintIcon();favicon();});});
+$('#iconEmoji').addEventListener('input',function(){S.emoji=this.value.trim()||'🗞️';save();favKey='';favicon();});
+paintIcon();
+
+/* source filter chips */
+$$('#chips button').forEach(function(b){
+  b.addEventListener('click',function(){
+    var f=b.getAttribute('data-c');
+    $$('#chips button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
+    $$('.card').forEach(function(c){c.hidden=f!=='all'&&c.getAttribute('data-cat')!==f;});
+  });
+});
+
+/* presets */
+var PRESETS=[
+  {n:'Newsroom',d:'Headlines stream past all day.',p:{on:['clock','wiki','hn','rss'],mode:'ticker',icon:'letter'}},
+  {n:'Focus',d:'Timer, eye breaks and a day ring.',p:{on:['pomo','eyes','day'],mode:'static',icon:'ring'}},
+  {n:'Commuter',d:'Time, weather and the next mail.',p:{on:['clock','weather','demo'],mode:'rotate',icon:'letter'}},
+  {n:'Calm',d:'Moon, breath and a gentle line.',p:{on:['moon','breathe','quotes'],mode:'type',icon:'emoji',emoji:'🌙'}},
+  {n:'Mission control',d:'Space station, quakes, markets.',p:{on:['clock','iss','quakes','crypto'],mode:'ticker',speed:7,icon:'emoji',emoji:'🛰️'}},
+  {n:'Night desk',d:'World clocks and rates, decoded.',p:{on:['tz','fx','crypto'],mode:'decode',icon:'letter'}}
+];
+function paintInputs(){
+  $('#spd').value=S.speed;$('#wid').value=S.width;$('#pre').value=S.prefix;$('#sep').value=S.sep;
+  paintStyle();paintIcon();
+}
+function applyPreset(p){
+  Object.keys(p).forEach(function(k){if(k!=='on')S[k]=p[k];});
+  SRC.forEach(function(s){
+    var on=p.on.indexOf(s.id)>-1;
+    if(on!==enabled(s.id)){swEl[s.id].setAttribute('aria-checked',on?'true':'false');toggle(s.id,on);}
+  });
+  t0=Date.now();save();paintInputs();startBeat();
+}
+PRESETS.forEach(function(p){
+  var b=document.createElement('button');b.type='button';
+  b.innerHTML='<b></b><span></span>';$('b',b).textContent=p.n;$('span',b).textContent=p.d;
+  b.addEventListener('click',function(){applyPreset(p.p);});
+  $('#presets').appendChild(b);
+});
+
+/* keep and share */
+function copyText(t,note){
+  function done(m){$('#shNote').textContent=m;$('#shNote').classList.remove('err');}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done(note);},function(){done('Copy failed. Use Show current and copy the text.');});}
+  else{done('Copy is not available here. Use Show current and copy the text.');}
+}
+function plain(){var o=Object.assign({},S);delete o.clientId;return o;}
+$('#shCopy').addEventListener('click',function(){
+  var enc=btoa(unescape(encodeURIComponent(JSON.stringify(plain()))));
+  copyText(location.href.split('#')[0]+'#s='+enc,'Link copied. Open it anywhere to get this setup.');
+});
+$('#shExport').addEventListener('click',function(){$('#shBox').value=JSON.stringify(plain(),null,1);$('#shNote').textContent='Copy this text to keep it.';});
+$('#shImport').addEventListener('click',function(){
+  try{var o=JSON.parse($('#shBox').value);delete o.clientId;Object.assign(S,o);save();location.reload();}
+  catch(e){$('#shNote').textContent='That does not look like a setup.';$('#shNote').classList.add('err');}
+});
+$('#shReset').addEventListener('click',function(){
+  if(!confirm('Reset all Tabline settings on this device?'))return;
+  try{localStorage.removeItem('tl-state');}catch(e){}
+  location.reload();
+});
 paintStyle();
 
 document.addEventListener('visibilitychange',function(){
@@ -666,6 +852,7 @@ document.addEventListener('visibilitychange',function(){
 });
 $('#liveNote').textContent='Live. Switch to another tab and watch the real tab move.';
 
+document.addEventListener('visibilitychange',function(){beat();});
 paintFeed();startBeat();
 })();
 </script>
